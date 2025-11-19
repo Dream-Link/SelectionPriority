@@ -3,50 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rajasthan Selection Analysis (Online)</title>
+    <title>Rajasthan Selection Analysis</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CSS Styles --- */
+        /* --- Core CSS --- */
         :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --error: #ef4444; --filter-active: #059669; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
+        
         .header { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .container { width: 95%; max-width: 900px; margin: 20px auto; }
         .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        
+        /* Success Message */
+        .success-card { text-align: center; background: #dcfce7; border: 1px solid #22c55e; display: none; }
+
         .form-group { margin-bottom: 20px; }
         label.main-label { font-weight: 600; display: block; margin-bottom: 8px; color: #334155; }
+        
+        /* Telegram Link Style */
+        .telegram-link {
+            font-size: 0.75rem; color: #2563eb; font-weight: 500; cursor: pointer; text-decoration: none;
+            background: #eff6ff; padding: 2px 6px; border-radius: 4px; margin-left: 5px; border: 1px solid #bfdbfe;
+        }
+        .telegram-link:hover { background: #dbeafe; text-decoration: underline; }
+
         input, select { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; background: #f8fafc; }
         input:focus, select:focus { border-color: var(--primary); background: #fff; }
         
-        /* Checkbox Grid */
+        /* Checkbox Grid (Normal Size for Form) */
         .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
         .chip-option input { display: none; }
         .chip-label { display: flex; align-items: center; justify-content: center; padding: 10px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; text-align: center; height: 100%; transition: 0.2s; }
         .chip-option input:checked + .chip-label { background: #eff6ff; border-color: var(--primary); color: var(--primary); font-weight: 700; box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2); }
 
-        /* Filter Styles */
+        /* --- CHILD SIZE FILTER STYLES (Updated) --- */
         .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .filter-chip-label { background: #f1f5f9; border: 1px solid #e2e8f0; color: #64748b; }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; } /* Tight Grid */
+        
+        .filter-chip-label { 
+            background: #f1f5f9; border: 1px solid #e2e8f0; color: #64748b; 
+            padding: 4px 2px; /* Very small padding */
+            font-size: 11px; /* Child Size Font */
+            border-radius: 4px;
+            min-height: 30px; /* Compact height */
+        }
         .filter-option input:checked + .filter-chip-label { background: #d1fae5; border-color: var(--filter-active); color: var(--filter-active); font-weight: 700; }
 
         .btn-submit { width: 100%; background: var(--primary); color: white; padding: 14px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-        .btn-submit:disabled { background: #ccc; }
+        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
 
-        /* Table */
+        /* Table Styles */
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { background: #334155; color: white; padding: 12px; font-size: 13px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
-        .data-badge { display: inline-block; background: #f8fafc; padding: 3px 8px; border-radius: 4px; font-size: 11px; margin: 2px; border: 1px solid #e2e8f0; }
+        td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; vertical-align: top; }
         
-        /* Modal */
+        .data-badge { 
+            display: inline-block; background: #f8fafc; padding: 6px 10px; 
+            border-radius: 6px; margin: 4px; border: 1px solid #e2e8f0;
+            min-width: 100px; vertical-align: top;
+        }
+        .badge-exam { font-weight: 700; font-size: 12px; display: block; color: #1e293b; }
+        .badge-roll { font-size: 11px; color: #64748b; display: block; margin-top: 2px; }
+        .badge-marks { font-size: 11px; color: var(--primary); font-weight: 600; display: block; margin-top: 2px; border-top: 1px dashed #e2e8f0; padding-top:2px; }
+
+        /* Modal System */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
-        .modal-box { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 380px; }
+        .modal-box { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .error-msg { color: var(--error); font-size: 0.8rem; display: none; margin-top: 5px; text-align: center; }
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .btn-modal { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .btn-confirm { background: var(--primary); color: white; } .btn-cancel { background: #e2e8f0; }
+        .btn-confirm { background: var(--primary); color: white; } 
+        .btn-cancel { background: #e2e8f0; color: #333; }
+        .btn-final { background: #16a34a; color: white; } /* Green for final submit */
+
+        /* Confirmation Modal Specifics */
+        .confirm-list { text-align: left; background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin: 10px 0; list-style: none; border: 1px solid #e2e8f0; }
+        .confirm-list li { margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
+        .warning-box { background: #fef2f2; color: #b91c1c; font-size: 0.85rem; padding: 10px; border-radius: 6px; border: 1px solid #fecaca; margin-top: 10px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -57,18 +93,28 @@
     </div>
 
     <div class="container">
-        <div class="card">
+        
+        <div class="card success-card" id="alreadySubmittedMsg">
+            <h3 style="color:#15803d;">✅ धन्यवाद!</h3>
+            <p style="color:#166534;">आपका डेटा सफलतापूर्वक जमा हो चुका है।</p>
+            <p style="font-size:12px; margin-top:5px; opacity:0.8;">(Duplicate entries are disabled)</p>
+        </div>
+
+        <div class="card" id="formCard">
             <h3 style="margin-bottom:15px; color:var(--primary);">📝 अपना डेटा भरें</h3>
             <form id="surveyForm">
                 <div class="form-group">
                     <label class="main-label">नाम (Name)</label>
-                    <input type="text" id="userName" placeholder="Ex: Rahul" required>
+                    <input type="text" id="userName" placeholder="Ex: DreamLink" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="main-label">किन एग्ज़ाम में Selection की संभावना है?</label>
+                    <label class="main-label">
+                        किन एग्ज़ाम में Selection की संभावना है?
+                        <a href="https://t.me/YOUR_TELEGRAM_LINK" target="_blank" class="telegram-link">koi aur exam add karwani ho to click kare telegram</a>
+                    </label>
                     <div class="checkbox-grid" id="dynamicExamGrid">
-                        <div style="padding:20px; color:gray; grid-column: 1/-1; text-align:center;">Loading exams from server...</div>
+                        <div style="padding:20px; color:gray; grid-column: 1/-1; text-align:center;">Loading exams...</div>
                     </div>
                 </div>
 
@@ -79,17 +125,17 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn-submit" id="submitBtn">Submit Data</button>
+                <button type="submit" class="btn-submit" id="preSubmitBtn">Submit Data</button>
             </form>
         </div>
 
         <div class="card" style="border-left: 5px solid var(--filter-active);">
             <div class="filter-header">
-                <h3 style="color: var(--text);">🔍 कॉमन कैंडिडेट फिल्टर</h3>
-                <span class="filter-count" id="resultCount">Loading...</span>
+                <h3 style="color: var(--text); font-size: 1.1rem;">🔍 कॉमन कैंडिडेट फिल्टर</h3>
+                <span class="filter-count" id="resultCount" style="font-size:0.8rem;">Loading...</span>
             </div>
-            <div class="checkbox-grid" id="dynamicFilterGrid">
-                <div style="padding:10px; color:gray; font-size:12px;">Loading filters...</div>
+            <div class="filter-grid" id="dynamicFilterGrid">
+                <div style="padding:10px; color:gray; font-size:10px;">Loading filters...</div>
             </div>
         </div>
 
@@ -99,7 +145,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Selected In (Roll/Marks)</th>
+                            <th>Selected In (Roll & Marks)</th>
                             <th>Joining Priority</th>
                         </tr>
                     </thead>
@@ -129,13 +175,29 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="submitConfirmModal">
+        <div class="modal-box">
+            <h3 style="text-align:center; color:var(--text);">Confirm Details</h3>
+            
+            <ul class="confirm-list" id="confirmSummary">
+                </ul>
+
+            <div class="warning-box">
+                ⚠️ Warning: एक डिवाइस से केवल एक बार ही भरा जा सकता है।
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" id="cancelFinalBtn">Edit</button>
+                <button class="btn-modal btn-final" id="finalSubmitBtn">Final Submit</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
-        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } 
             from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Config
         const firebaseConfig = {
             apiKey: "AIzaSyA4Vx053wPlyy0CMVQVSV3T26Ib359obTs",
             authDomain: "selectionexam-96832.firebaseapp.com",
@@ -148,121 +210,101 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Variables & Elements
         let verifiedData = {}; 
         let currentCheckbox = null;
         let globalServerData = []; 
 
-        const examGrid = document.getElementById('dynamicExamGrid');
-        const filterGrid = document.getElementById('dynamicFilterGrid');
-        const modal = document.getElementById('detailsModal');
-        const rollInput = document.getElementById('rollInput');
-        const marksInput = document.getElementById('marksInput');
-        const prefSelect = document.getElementById('preference');
-        const submitBtn = document.getElementById('submitBtn');
+        // Elements
+        const formCard = document.getElementById('formCard');
+        const alreadySubmittedMsg = document.getElementById('alreadySubmittedMsg');
+        const submitConfirmModal = document.getElementById('submitConfirmModal');
+        const finalSubmitBtn = document.getElementById('finalSubmitBtn');
 
-        // --- 1. LOAD EXAMS FROM SERVER (Admin ne jo add kiye) ---
+        // Pre-check submission
+        if (localStorage.getItem('hasSubmittedData') === 'true') {
+            formCard.style.display = 'none';      
+            alreadySubmittedMsg.style.display = 'block'; 
+        }
+
+        // --- LOAD EXAMS ---
         const qExams = query(collection(db, "exam_list"), orderBy("name"));
-        
         onSnapshot(qExams, (snapshot) => {
-            examGrid.innerHTML = "";
-            filterGrid.innerHTML = "";
+            const examGrid = document.getElementById('dynamicExamGrid');
+            const filterGrid = document.getElementById('dynamicFilterGrid');
+            examGrid.innerHTML = ""; filterGrid.innerHTML = "";
 
             if (snapshot.empty) {
-                examGrid.innerHTML = "<div style='color:red'>No exams found. Add from Admin Panel.</div>";
+                examGrid.innerHTML = "<div style='color:red'>No exams. Add from Admin Panel.</div>";
                 return;
             }
 
             snapshot.forEach((doc) => {
                 const examName = doc.data().name;
                 
-                // Form Checkbox create karein
+                // Form Checkbox
                 const div1 = document.createElement('div');
                 div1.className = "chip-option";
-                div1.innerHTML = `
-                    <input type="checkbox" id="ex_${examName}" value="${examName}" class="exam-opt">
-                    <label for="ex_${examName}" class="chip-label">${examName}</label>
-                `;
+                div1.innerHTML = `<input type="checkbox" id="ex_${examName}" value="${examName}" class="exam-opt"><label for="ex_${examName}" class="chip-label">${examName}</label>`;
                 examGrid.appendChild(div1);
 
-                // Filter Checkbox create karein
+                // Child Size Filter Checkbox
                 const div2 = document.createElement('div');
                 div2.className = "chip-option filter-option";
-                div2.innerHTML = `
-                    <input type="checkbox" id="fil_${examName}" value="${examName}" class="filter-opt">
-                    <label for="fil_${examName}" class="chip-label filter-chip-label">${examName}</label>
-                `;
+                div2.innerHTML = `<input type="checkbox" id="fil_${examName}" value="${examName}" class="filter-opt"><label for="fil_${examName}" class="chip-label filter-chip-label">${examName}</label>`;
                 filterGrid.appendChild(div2);
             });
-
-            // Checkbox banne ke baad hi listener lagayen
             attachListeners();
         });
 
-
-        // --- 2. LOAD STUDENT DATA ---
+        // --- LOAD DATA ---
         const qData = query(collection(db, "candidates_data"), orderBy("timestamp", "desc"));
         onSnapshot(qData, (snapshot) => {
             globalServerData = [];
             snapshot.forEach((doc) => globalServerData.push(doc.data()));
-            applyFilters(); // Data aate hi table update karein
+            applyFilters();
         });
 
-        // --- 3. LISTENERS FUNCTION ---
         function attachListeners() {
-            // Exam Selection Listeners
             document.querySelectorAll('.exam-opt').forEach(box => {
                 box.addEventListener('change', function() {
-                    if (this.checked) {
-                        currentCheckbox = this;
-                        openModal(this.value);
-                    } else {
-                        delete verifiedData[this.value];
-                        updatePreferenceOptions();
-                    }
+                    if (this.checked) { currentCheckbox = this; openModal(this.value); } 
+                    else { delete verifiedData[this.value]; updatePreferenceOptions(); }
                 });
             });
-
-            // Filter Listeners
             document.querySelectorAll('.filter-opt').forEach(box => {
                 box.addEventListener('change', applyFilters);
             });
         }
 
-        // --- 4. MODAL LOGIC ---
+        // --- INPUT DETAILS MODAL ---
+        const modal = document.getElementById('detailsModal');
+        const rollInput = document.getElementById('rollInput');
+        const marksInput = document.getElementById('marksInput');
+        const prefSelect = document.getElementById('preference');
+
         function openModal(examName) {
             document.getElementById('modalExamName').innerText = examName;
             rollInput.value = ''; marksInput.value = '';
             document.getElementById('modalError').style.display = 'none';
             modal.style.display = 'flex'; rollInput.focus();
         }
-
         document.getElementById('cancelBtn').addEventListener('click', () => {
             if(currentCheckbox) currentCheckbox.checked = false;
             modal.style.display = 'none';
         });
-
         document.getElementById('confirmBtn').addEventListener('click', () => {
             const roll = rollInput.value.trim();
             const marks = marksInput.value.trim();
-
-            if (!/^\d+$/.test(roll) || roll.length < 4) {
-                return showError("Invalid Roll Number");
-            }
-            if (!marks || isNaN(marks)) {
-                return showError("Invalid Marks");
-            }
-
+            if (!/^\d+$/.test(roll) || roll.length < 4) return showError("Invalid Roll Number");
+            if (!marks || isNaN(marks)) return showError("Invalid Marks");
             verifiedData[currentCheckbox.value] = { roll, marks };
             updatePreferenceOptions();
             modal.style.display = 'none';
         });
-
         function showError(msg) {
             const err = document.getElementById('modalError');
             err.innerText = msg; err.style.display = 'block';
         }
-
         function updatePreferenceOptions() {
             prefSelect.innerHTML = '<option value="">-- प्राथमिकता चुनें --</option>';
             let hasData = false;
@@ -275,39 +317,78 @@
             if(!hasData) prefSelect.innerHTML = '<option value="">-- पहले एग्ज़ाम टिक करें --</option>';
         }
 
-        // --- 5. SUBMIT DATA ---
-        document.getElementById('surveyForm').addEventListener('submit', async (e) => {
+        // --- SUBMIT FLOW (UPDATED) ---
+        
+        // Step 1: Initial Submit Click -> Show Confirmation Modal
+        document.getElementById('surveyForm').addEventListener('submit', (e) => {
             e.preventDefault();
+            if (localStorage.getItem('hasSubmittedData') === 'true') {
+                alert("Already submitted!"); return;
+            }
+
             const name = document.getElementById('userName').value;
             const pref = document.getElementById('preference').value;
-
             if (!pref) return alert("Please select preference");
 
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Saving...";
-
-            const examList = Object.entries(verifiedData).map(([k, v]) => ({ name: k, roll: v.roll, marks: v.marks }));
+            // Fill Confirmation Details
+            const confirmList = document.getElementById('confirmSummary');
+            confirmList.innerHTML = `<li><strong>Name:</strong> ${name}</li>`;
             
+            Object.entries(verifiedData).forEach(([exam, details]) => {
+                confirmList.innerHTML += `
+                    <li>
+                        <strong>${exam}:</strong> Roll ${details.roll} (${details.marks} M)
+                    </li>`;
+            });
+            confirmList.innerHTML += `<li style="color:green; margin-top:5px;"><strong>Joining Priority:</strong> ${pref}</li>`;
+
+            // Show Warning Popup
+            submitConfirmModal.style.display = 'flex';
+        });
+
+        // Step 2: Cancel/Edit Logic
+        document.getElementById('cancelFinalBtn').addEventListener('click', () => {
+            submitConfirmModal.style.display = 'none';
+        });
+
+        // Step 3: FINAL SUBMIT TO SERVER
+        finalSubmitBtn.addEventListener('click', async () => {
+            finalSubmitBtn.disabled = true;
+            finalSubmitBtn.innerText = "Saving...";
+
+            const name = document.getElementById('userName').value;
+            const pref = document.getElementById('preference').value;
+            const examList = Object.entries(verifiedData).map(([k, v]) => ({ name: k, roll: v.roll, marks: v.marks }));
+
             try {
                 await addDoc(collection(db, "candidates_data"), {
                     name: name, exams: examList, preference: pref, timestamp: serverTimestamp()
                 });
-                location.reload(); // Reload to clear form properly
+
+                // Lock Device
+                localStorage.setItem('hasSubmittedData', 'true');
+
+                // UI Updates
+                submitConfirmModal.style.display = 'none';
+                formCard.style.display = 'none';
+                alreadySubmittedMsg.style.display = 'block';
+                alert("Data saved successfully!");
+
             } catch (err) {
                 alert("Error: " + err.message);
-                submitBtn.disabled = false;
+                finalSubmitBtn.disabled = false;
+                finalSubmitBtn.innerText = "Final Submit";
             }
         });
 
-        // --- 6. FILTER & TABLE LOGIC ---
+
+        // --- FILTER LOGIC ---
         function applyFilters() {
             const activeFilters = Array.from(document.querySelectorAll('.filter-opt:checked')).map(b => b.value);
-            
             const filtered = globalServerData.filter(user => {
                 if (activeFilters.length === 0) return true;
                 return activeFilters.every(f => user.exams.some(ue => ue.name === f));
             });
-
             document.getElementById('resultCount').innerText = `${filtered.length} Students`;
             renderTable(filtered);
         }
@@ -315,25 +396,25 @@
         function renderTable(data) {
             const tbody = document.querySelector('#dataTable tbody');
             tbody.innerHTML = '';
-            
-            if(data.length === 0) {
-                document.getElementById('noDataMsg').style.display = 'block';
-                return;
-            }
+            if(data.length === 0) { document.getElementById('noDataMsg').style.display = 'block'; return; }
             document.getElementById('noDataMsg').style.display = 'none';
 
             data.forEach(user => {
                 const tr = document.createElement('tr');
                 const examsHtml = user.exams.map(e => {
                     const style = (e.name === user.preference) ? "border-color:green; background:#f0fdf4;" : "";
-                    return `<span class="data-badge" style="${style}"><b>${e.name}</b> (${e.marks})</span>`;
-                }).join(' ');
-
-                tr.innerHTML = `<td><b>${user.name}</b></td><td>${examsHtml}</td><td style="color:green;font-weight:bold">${user.preference}</td>`;
+                    return `
+                        <div class="data-badge" style="${style}">
+                            <span class="badge-exam">${e.name}</span>
+                            <span class="badge-roll">Roll: ${e.roll}</span>
+                            <span class="badge-marks">${e.marks} Marks</span>
+                        </div>
+                    `;
+                }).join('');
+                tr.innerHTML = `<td style="font-weight:bold;">${user.name}</td><td>${examsHtml}</td><td style="color:green;font-weight:bold">${user.preference}</td>`;
                 tbody.appendChild(tr);
             });
         }
-
     </script>
 </body>
 </html>
