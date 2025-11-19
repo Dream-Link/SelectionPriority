@@ -423,9 +423,10 @@
             data.forEach(user => {
                 const tr = document.createElement('tr');
                 const examsHtml = user.exams.map(e => {
-                    const style = (e.name === user.preference) ? "border-color:green; background:#f0fdf4;" : "";
-                    return `<div class="data-badge" style="${style}"><span class="badge-exam">${e.name}</span><span class="badge-roll">Roll: ${e.roll}</span><span class="badge-marks">${e.marks} Marks</span></div>`;
-                }).join('');
+    const style = (e.name === user.preference) ? "border-color:green; background:#f0fdf4;" : "";
+    // यहाँ से Roll वाला <span> हटा दिया गया है
+    return `<div class="data-badge" style="${style}"><span class="badge-exam">${e.name}</span><span class="badge-marks">${e.marks} Marks</span></div>`;
+}).join('');
                 
                 // Name Column with Category Badge
                 const nameCell = `
