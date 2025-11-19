@@ -105,16 +105,9 @@
 
                 <div class="form-group">
                     <label class="main-label">किन एग्ज़ाम में Selection की संभावना है?</label>
-                    <div class="checkbox-grid">
-                        <div class="chip-option"><input type="checkbox" id="e1" value="VDO" class="exam-opt"><label for="e1" class="chip-label">VDO</label></div>
-                        <div class="chip-option"><input type="checkbox" id="e2" value="Patwar" class="exam-opt"><label for="e2" class="chip-label">Patwar</label></div>
-                        <div class="chip-option"><input type="checkbox" id="e3" value="Raj Police" class="exam-opt"><label for="e3" class="chip-label">Raj Police</label></div>
-                        <div class="chip-option"><input type="checkbox" id="e4" value="REET L1" class="exam-opt"><label for="e4" class="chip-label">REET L1</label></div>
-                        <div class="chip-option"><input type="checkbox" id="e5" value="REET L2" class="exam-opt"><label for="e5" class="chip-label">REET L2</label></div>
-                        <div class="chip-option"><input type="checkbox" id="e6" value="Jr. Acc." class="exam-opt"><label for="e6" class="chip-label">Jr. Acc.</label></div>
-                        <div class="chip-option"><input type="checkbox" id="e7" value="LDC" class="exam-opt"><label for="e7" class="chip-label">LDC</label></div>
-                        <div class="chip-option"><input type="checkbox" id="e8" value="SI" class="exam-opt"><label for="e8" class="chip-label">SI</label></div>
-                    </div>
+                   <div class="checkbox-grid" id="dynamicExamGrid">
+                   <div style="padding:10px; color:gray;">Loading exams...</div>
+                  </div>
                 </div>
 
                 <div class="form-group">
@@ -134,16 +127,8 @@
                 <h3 style="color: var(--text);">🔍 कॉमन कैंडिडेट फिल्टर</h3>
                 <span class="filter-count" id="resultCount">Loading data...</span>
             </div>
-            <div class="checkbox-grid">
-                <div class="chip-option filter-option"><input type="checkbox" id="f1" value="VDO" class="filter-opt"><label for="f1" class="chip-label filter-chip-label">VDO</label></div>
-                <div class="chip-option filter-option"><input type="checkbox" id="f2" value="Patwar" class="filter-opt"><label for="f2" class="chip-label filter-chip-label">Patwar</label></div>
-                <div class="chip-option filter-option"><input type="checkbox" id="f3" value="Raj Police" class="filter-opt"><label for="f3" class="chip-label filter-chip-label">Raj Police</label></div>
-                <div class="chip-option filter-option"><input type="checkbox" id="f4" value="REET L1" class="filter-opt"><label for="f4" class="chip-label filter-chip-label">REET L1</label></div>
-                <div class="chip-option filter-option"><input type="checkbox" id="f5" value="REET L2" class="filter-opt"><label for="f5" class="chip-label filter-chip-label">REET L2</label></div>
-                <div class="chip-option filter-option"><input type="checkbox" id="f6" value="Jr. Acc." class="filter-opt"><label for="f6" class="chip-label filter-chip-label">Jr. Acc.</label></div>
-                <div class="chip-option filter-option"><input type="checkbox" id="f7" value="LDC" class="filter-opt"><label for="f7" class="chip-label filter-chip-label">LDC</label></div>
-                <div class="chip-option filter-option"><input type="checkbox" id="f8" value="SI" class="filter-opt"><label for="f8" class="chip-label filter-chip-label">SI</label></div>
-            </div>
+           <div class="checkbox-grid" id="dynamicFilterGrid">
+          </div>
         </div>
 
         <!-- TABLE -->
@@ -201,6 +186,75 @@
             appId: "1:591171111866:web:a721c6e7aa51339412ab83"
         };
 
+        // --- NEW: LOAD EXAMS DYNAMICALLY ---
+// (पुराने hardcoded exams की जगह यह कोड admin द्वारा जोड़े गए exams लाएगा)
+
+const examGrid = document.getElementById('dynamicExamGrid');
+const filterGrid = document.getElementById('dynamicFilterGrid');
+const examCollectionName = "exam_list";
+
+// Load Exams from Firebase
+const qExams = query(collection(db, examCollectionName), orderBy("name"));
+
+onSnapshot(qExams, (snapshot) => {
+    // 1. Clear Old HTML
+    examGrid.innerHTML = "";
+    filterGrid.innerHTML = "";
+
+    if (snapshot.empty) {
+        examGrid.innerHTML = "<small>No exams added by Admin yet.</small>";
+        return;
+    }
+
+    snapshot.forEach((doc) => {
+        const examName = doc.data().name;
+        
+        // Create Form Checkbox
+        const div1 = document.createElement('div');
+        div1.className = "chip-option";
+        div1.innerHTML = `
+            <input type="checkbox" id="ex_${examName}" value="${examName}" class="exam-opt">
+            <label for="ex_${examName}" class="chip-label">${examName}</label>
+        `;
+        examGrid.appendChild(div1);
+
+        // Create Filter Checkbox
+        const div2 = document.createElement('div');
+        div2.className = "chip-option filter-option";
+        div2.innerHTML = `
+            <input type="checkbox" id="fil_${examName}" value="${examName}" class="filter-opt">
+            <label for="fil_${examName}" class="chip-label filter-chip-label">${examName}</label>
+        `;
+        filterGrid.appendChild(div2);
+    });
+
+    // Re-attach Event Listeners (Kyuki HTML naya ban raha hai)
+    attachExamListeners(); 
+    attachFilterListeners();
+});
+
+// --- IMPORTANT Helper Functions ---
+// पुराने कोड में जहाँ document.querySelectorAll use हुआ था, उसे फंक्शन में डालना पड़ेगा
+function attachExamListeners() {
+    document.querySelectorAll('.exam-opt').forEach(box => {
+        box.addEventListener('change', function() {
+            if (this.checked) {
+                currentCheckbox = this;
+                openModal(this.value);
+            } else {
+                delete verifiedData[this.value];
+                updatePreferenceOptions();
+            }
+        });
+    });
+}
+
+function attachFilterListeners() {
+    const filters = document.querySelectorAll('.filter-opt');
+    filters.forEach(box => box.addEventListener('change', applyFilters));
+    // Update global filter variable needed for applyFilters function
+    // (Note: Make sure applyFilters function uses document.querySelectorAll('.filter-opt') inside it)
+}
         // 3. Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
