@@ -32,22 +32,18 @@
         input, select { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; background: #f8fafc; }
         input:focus, select:focus { border-color: var(--primary); background: #fff; }
         
-        /* Checkbox Grid (Normal Size for Form) */
+        /* Checkbox Grid */
         .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
         .chip-option input { display: none; }
         .chip-label { display: flex; align-items: center; justify-content: center; padding: 10px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; text-align: center; height: 100%; transition: 0.2s; }
         .chip-option input:checked + .chip-label { background: #eff6ff; border-color: var(--primary); color: var(--primary); font-weight: 700; box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2); }
 
-        /* --- CHILD SIZE FILTER STYLES (Updated) --- */
+        /* Child Size Filter */
         .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; } /* Tight Grid */
-        
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; }
         .filter-chip-label { 
             background: #f1f5f9; border: 1px solid #e2e8f0; color: #64748b; 
-            padding: 4px 2px; /* Very small padding */
-            font-size: 11px; /* Child Size Font */
-            border-radius: 4px;
-            min-height: 30px; /* Compact height */
+            padding: 4px 2px; font-size: 11px; border-radius: 4px; min-height: 30px; 
         }
         .filter-option input:checked + .filter-chip-label { background: #d1fae5; border-color: var(--filter-active); color: var(--filter-active); font-weight: 700; }
 
@@ -60,6 +56,8 @@
         th { background: #334155; color: white; padding: 12px; font-size: 13px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; vertical-align: top; }
         
+        .cat-badge { font-size: 10px; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: bold; display: inline-block; margin-top: 2px; }
+
         .data-badge { 
             display: inline-block; background: #f8fafc; padding: 6px 10px; 
             border-radius: 6px; margin: 4px; border: 1px solid #e2e8f0;
@@ -77,9 +75,8 @@
         .btn-modal { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
         .btn-confirm { background: var(--primary); color: white; } 
         .btn-cancel { background: #e2e8f0; color: #333; }
-        .btn-final { background: #16a34a; color: white; } /* Green for final submit */
+        .btn-final { background: #16a34a; color: white; } 
 
-        /* Confirmation Modal Specifics */
         .confirm-list { text-align: left; background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin: 10px 0; list-style: none; border: 1px solid #e2e8f0; }
         .confirm-list li { margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
         .warning-box { background: #fef2f2; color: #b91c1c; font-size: 0.85rem; padding: 10px; border-radius: 6px; border: 1px solid #fecaca; margin-top: 10px; font-weight: 600; }
@@ -105,13 +102,26 @@
             <form id="surveyForm">
                 <div class="form-group">
                     <label class="main-label">नाम (Name)</label>
-                    <input type="text" id="userName" placeholder="Ex: DreamLink" required>
+                    <input type="text" id="userName" placeholder="Ex: Rahul" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="main-label">श्रेणी (Category)</label>
+                    <select id="userCategory" required>
+                        <option value="">-- Select Category --</option>
+                        <option value="GEN">GEN</option>
+                        <option value="OBC">OBC</option>
+                        <option value="EWS">EWS</option>
+                        <option value="SC">SC</option>
+                        <option value="ST">ST</option>
+                        <option value="MBC">MBC</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
                     <label class="main-label">
                         किन एग्ज़ाम में Selection की संभावना है?
-                        <a href="https://t.me/YOUR_TELEGRAM_LINK" target="_blank" class="telegram-link">koi aur exam add karwani ho to click kare telegram</a>
+                        <a href="https://t.me/Dreamlinkmp" target="_blank" class="telegram-link">koi aur exam add karwani ho to click kare telegram</a>
                     </label>
                     <div class="checkbox-grid" id="dynamicExamGrid">
                         <div style="padding:20px; color:gray; grid-column: 1/-1; text-align:center;">Loading exams...</div>
@@ -144,7 +154,7 @@
                 <table id="dataTable">
                     <thead>
                         <tr>
-                            <th>Name</th>
+                            <th>Name & Category</th>
                             <th>Selected In (Roll & Marks)</th>
                             <th>Joining Priority</th>
                         </tr>
@@ -195,7 +205,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } 
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, where, getDocs } 
             from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -214,23 +224,41 @@
         let currentCheckbox = null;
         let globalServerData = []; 
 
-        // Elements
         const formCard = document.getElementById('formCard');
         const alreadySubmittedMsg = document.getElementById('alreadySubmittedMsg');
         const submitConfirmModal = document.getElementById('submitConfirmModal');
         const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+        const examGrid = document.getElementById('dynamicExamGrid');
+        const filterGrid = document.getElementById('dynamicFilterGrid');
 
-        // Pre-check submission
-        if (localStorage.getItem('hasSubmittedData') === 'true') {
-            formCard.style.display = 'none';      
-            alreadySubmittedMsg.style.display = 'block'; 
+        // --- DEVICE ID LOGIC ---
+        function getOrCreateDeviceId() {
+            let id = localStorage.getItem('unique_device_id');
+            if (!id) {
+                id = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('unique_device_id', id);
+            }
+            return id;
         }
+        const myDeviceId = getOrCreateDeviceId();
+
+        async function checkSubmissionStatus() {
+            const qCheck = query(collection(db, "candidates_data"), where("deviceId", "==", myDeviceId));
+            const querySnapshot = await getDocs(qCheck);
+
+            if (!querySnapshot.empty) {
+                formCard.style.display = 'none';
+                alreadySubmittedMsg.style.display = 'block';
+            } else {
+                formCard.style.display = 'block';
+                alreadySubmittedMsg.style.display = 'none';
+            }
+        }
+        checkSubmissionStatus();
 
         // --- LOAD EXAMS ---
         const qExams = query(collection(db, "exam_list"), orderBy("name"));
         onSnapshot(qExams, (snapshot) => {
-            const examGrid = document.getElementById('dynamicExamGrid');
-            const filterGrid = document.getElementById('dynamicFilterGrid');
             examGrid.innerHTML = ""; filterGrid.innerHTML = "";
 
             if (snapshot.empty) {
@@ -240,14 +268,11 @@
 
             snapshot.forEach((doc) => {
                 const examName = doc.data().name;
-                
-                // Form Checkbox
                 const div1 = document.createElement('div');
                 div1.className = "chip-option";
                 div1.innerHTML = `<input type="checkbox" id="ex_${examName}" value="${examName}" class="exam-opt"><label for="ex_${examName}" class="chip-label">${examName}</label>`;
                 examGrid.appendChild(div1);
 
-                // Child Size Filter Checkbox
                 const div2 = document.createElement('div');
                 div2.className = "chip-option filter-option";
                 div2.innerHTML = `<input type="checkbox" id="fil_${examName}" value="${examName}" class="filter-opt"><label for="fil_${examName}" class="chip-label filter-chip-label">${examName}</label>`;
@@ -262,6 +287,7 @@
             globalServerData = [];
             snapshot.forEach((doc) => globalServerData.push(doc.data()));
             applyFilters();
+            checkSubmissionStatus(); 
         });
 
         function attachListeners() {
@@ -276,7 +302,7 @@
             });
         }
 
-        // --- INPUT DETAILS MODAL ---
+        // --- INPUT MODAL ---
         const modal = document.getElementById('detailsModal');
         const rollInput = document.getElementById('rollInput');
         const marksInput = document.getElementById('marksInput');
@@ -317,61 +343,57 @@
             if(!hasData) prefSelect.innerHTML = '<option value="">-- पहले एग्ज़ाम टिक करें --</option>';
         }
 
-        // --- SUBMIT FLOW (UPDATED) ---
-        
-        // Step 1: Initial Submit Click -> Show Confirmation Modal
-        document.getElementById('surveyForm').addEventListener('submit', (e) => {
+        // --- SUBMIT FLOW ---
+        document.getElementById('surveyForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (localStorage.getItem('hasSubmittedData') === 'true') {
-                alert("Already submitted!"); return;
+            
+            const qCheck = query(collection(db, "candidates_data"), where("deviceId", "==", myDeviceId));
+            const snapshot = await getDocs(qCheck);
+            if (!snapshot.empty) {
+                alert("Already Submitted!"); location.reload(); return;
             }
 
             const name = document.getElementById('userName').value;
+            const category = document.getElementById('userCategory').value; // GET CATEGORY
             const pref = document.getElementById('preference').value;
+            
+            if (!category) return alert("Please select Category");
             if (!pref) return alert("Please select preference");
 
-            // Fill Confirmation Details
             const confirmList = document.getElementById('confirmSummary');
-            confirmList.innerHTML = `<li><strong>Name:</strong> ${name}</li>`;
-            
+            confirmList.innerHTML = `<li><strong>Name:</strong> ${name} <span style="font-size:11px; background:#eee; padding:2px 5px;">${category}</span></li>`;
             Object.entries(verifiedData).forEach(([exam, details]) => {
-                confirmList.innerHTML += `
-                    <li>
-                        <strong>${exam}:</strong> Roll ${details.roll} (${details.marks} M)
-                    </li>`;
+                confirmList.innerHTML += `<li><strong>${exam}:</strong> Roll ${details.roll} (${details.marks} M)</li>`;
             });
-            confirmList.innerHTML += `<li style="color:green; margin-top:5px;"><strong>Joining Priority:</strong> ${pref}</li>`;
-
-            // Show Warning Popup
+            confirmList.innerHTML += `<li style="color:green; margin-top:5px;"><strong>Priority:</strong> ${pref}</li>`;
             submitConfirmModal.style.display = 'flex';
         });
 
-        // Step 2: Cancel/Edit Logic
         document.getElementById('cancelFinalBtn').addEventListener('click', () => {
             submitConfirmModal.style.display = 'none';
         });
 
-        // Step 3: FINAL SUBMIT TO SERVER
         finalSubmitBtn.addEventListener('click', async () => {
             finalSubmitBtn.disabled = true;
             finalSubmitBtn.innerText = "Saving...";
 
             const name = document.getElementById('userName').value;
+            const category = document.getElementById('userCategory').value;
             const pref = document.getElementById('preference').value;
             const examList = Object.entries(verifiedData).map(([k, v]) => ({ name: k, roll: v.roll, marks: v.marks }));
 
             try {
                 await addDoc(collection(db, "candidates_data"), {
-                    name: name, exams: examList, preference: pref, timestamp: serverTimestamp()
+                    name: name, 
+                    category: category, // SAVE CATEGORY
+                    exams: examList, 
+                    preference: pref, 
+                    deviceId: myDeviceId, 
+                    timestamp: serverTimestamp()
                 });
 
-                // Lock Device
-                localStorage.setItem('hasSubmittedData', 'true');
-
-                // UI Updates
                 submitConfirmModal.style.display = 'none';
-                formCard.style.display = 'none';
-                alreadySubmittedMsg.style.display = 'block';
+                checkSubmissionStatus(); 
                 alert("Data saved successfully!");
 
             } catch (err) {
@@ -381,8 +403,7 @@
             }
         });
 
-
-        // --- FILTER LOGIC ---
+        // --- TABLE RENDER ---
         function applyFilters() {
             const activeFilters = Array.from(document.querySelectorAll('.filter-opt:checked')).map(b => b.value);
             const filtered = globalServerData.filter(user => {
@@ -403,15 +424,16 @@
                 const tr = document.createElement('tr');
                 const examsHtml = user.exams.map(e => {
                     const style = (e.name === user.preference) ? "border-color:green; background:#f0fdf4;" : "";
-                    return `
-                        <div class="data-badge" style="${style}">
-                            <span class="badge-exam">${e.name}</span>
-                            <span class="badge-roll">Roll: ${e.roll}</span>
-                            <span class="badge-marks">${e.marks} Marks</span>
-                        </div>
-                    `;
+                    return `<div class="data-badge" style="${style}"><span class="badge-exam">${e.name}</span><span class="badge-roll">Roll: ${e.roll}</span><span class="badge-marks">${e.marks} Marks</span></div>`;
                 }).join('');
-                tr.innerHTML = `<td style="font-weight:bold;">${user.name}</td><td>${examsHtml}</td><td style="color:green;font-weight:bold">${user.preference}</td>`;
+                
+                // Name Column with Category Badge
+                const nameCell = `
+                    <div style="font-weight:bold;">${user.name}</div>
+                    <span class="cat-badge">${user.category || 'N/A'}</span>
+                `;
+
+                tr.innerHTML = `<td>${nameCell}</td><td>${examsHtml}</td><td style="color:green;font-weight:bold">${user.preference}</td>`;
                 tbody.appendChild(tr);
             });
         }
