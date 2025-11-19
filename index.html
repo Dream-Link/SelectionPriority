@@ -3,111 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rajasthan Selection Analysis</title>
+    <title>Rajasthan Selection Analysis (Online)</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CSS में कोई बदलाव नहीं है, वही मॉडर्न डिज़ाइन --- */
-        :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
-            --error: #ef4444;
-            --filter-active: #059669;
-        }
+        /* --- CSS Styles --- */
+        :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --error: #ef4444; --filter-active: #059669; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            padding-bottom: 60px;
-        }
-        .header {
-            background: linear-gradient(135deg, #1e40af, #3b82f6);
-            color: white; padding: 20px; text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .header h2 { font-size: 1.4rem; margin-bottom: 5px; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
+        .header { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .container { width: 95%; max-width: 900px; margin: 20px auto; }
-        .card {
-            background: var(--card); padding: 20px; border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-        }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
         .form-group { margin-bottom: 20px; }
         label.main-label { font-weight: 600; display: block; margin-bottom: 8px; color: #334155; }
-        input[type="text"], input[type="number"], select {
-            width: 100%; padding: 12px; border: 2px solid #cbd5e1;
-            border-radius: 8px; font-size: 1rem; outline: none; background: #f8fafc;
-        }
+        input, select { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; background: #f8fafc; }
         input:focus, select:focus { border-color: var(--primary); background: #fff; }
-        .checkbox-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px;
-        }
+        
+        /* Checkbox Grid */
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
         .chip-option input { display: none; }
-        .chip-label {
-            display: block; text-align: center; padding: 8px;
-            background: #fff; border: 1px solid #cbd5e1; border-radius: 6px;
-            cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.2s;
-        }
-        .chip-option input:checked + .chip-label {
-            background: #eff6ff; border-color: var(--primary); color: var(--primary); font-weight: 700;
-        }
+        .chip-label { display: flex; align-items: center; justify-content: center; padding: 10px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; text-align: center; height: 100%; transition: 0.2s; }
+        .chip-option input:checked + .chip-label { background: #eff6ff; border-color: var(--primary); color: var(--primary); font-weight: 700; box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2); }
+
+        /* Filter Styles */
         .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .filter-chip-label { background: #f1f5f9; border: 1px solid #e2e8f0; color: #64748b; }
-        .filter-option input:checked + .filter-chip-label {
-            background: #d1fae5; border-color: var(--filter-active); color: var(--filter-active); font-weight: 700;
-        }
-        .btn-submit {
-            width: 100%; background: var(--primary); color: white;
-            padding: 14px; border: none; border-radius: 8px;
-            font-size: 1rem; font-weight: 600; cursor: pointer;
-        }
-        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
+        .filter-option input:checked + .filter-chip-label { background: #d1fae5; border-color: var(--filter-active); color: var(--filter-active); font-weight: 700; }
+
+        .btn-submit { width: 100%; background: var(--primary); color: white; padding: 14px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .btn-submit:disabled { background: #ccc; }
+
+        /* Table */
         .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { background: #334155; color: white; padding: 12px; font-size: 13px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 12px; vertical-align: top; color: #334155; }
-        .data-badge {
-            display: inline-block; background: #f8fafc; padding: 3px 8px;
-            border-radius: 4px; font-size: 11px; margin: 2px; border: 1px solid #e2e8f0;
-        }
-        .marks-highlight { color: var(--primary); font-weight: 700; }
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
-        }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+        .data-badge { display: inline-block; background: #f8fafc; padding: 3px 8px; border-radius: 4px; font-size: 11px; margin: 2px; border: 1px solid #e2e8f0; }
+        
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
         .modal-box { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 380px; }
         .error-msg { color: var(--error); font-size: 0.8rem; display: none; margin-top: 5px; text-align: center; }
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .btn-modal { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .btn-cancel { background: #e2e8f0; color: #475569; }
-        .btn-confirm { background: var(--primary); color: white; }
+        .btn-confirm { background: var(--primary); color: white; } .btn-cancel { background: #e2e8f0; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h2>Rajasthan Selection Survey</h2>
-        <p>Online Database (Live Sync)</p>
+        <p>Live Database Sync</p>
     </div>
 
     <div class="container">
-        <!-- FORM -->
         <div class="card">
             <h3 style="margin-bottom:15px; color:var(--primary);">📝 अपना डेटा भरें</h3>
             <form id="surveyForm">
                 <div class="form-group">
                     <label class="main-label">नाम (Name)</label>
-                    <input type="text" id="userName" placeholder="Ex: Dream Link" required>
+                    <input type="text" id="userName" placeholder="Ex: Rahul" required>
                 </div>
 
                 <div class="form-group">
                     <label class="main-label">किन एग्ज़ाम में Selection की संभावना है?</label>
-                   <div class="checkbox-grid" id="dynamicExamGrid">
-                   <div style="padding:10px; color:gray;">Loading exams...</div>
-                  </div>
+                    <div class="checkbox-grid" id="dynamicExamGrid">
+                        <div style="padding:20px; color:gray; grid-column: 1/-1; text-align:center;">Loading exams from server...</div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -121,17 +83,16 @@
             </form>
         </div>
 
-        <!-- FILTER -->
         <div class="card" style="border-left: 5px solid var(--filter-active);">
             <div class="filter-header">
                 <h3 style="color: var(--text);">🔍 कॉमन कैंडिडेट फिल्टर</h3>
-                <span class="filter-count" id="resultCount">Loading data...</span>
+                <span class="filter-count" id="resultCount">Loading...</span>
             </div>
-           <div class="checkbox-grid" id="dynamicFilterGrid">
-          </div>
+            <div class="checkbox-grid" id="dynamicFilterGrid">
+                <div style="padding:10px; color:gray; font-size:12px;">Loading filters...</div>
+            </div>
         </div>
 
-        <!-- TABLE -->
         <div class="card" style="padding:0; overflow:hidden;">
             <div class="table-wrapper">
                 <table id="dataTable">
@@ -149,7 +110,6 @@
         </div>
     </div>
 
-    <!-- MODAL (Popup) -->
     <div class="modal-overlay" id="detailsModal">
         <div class="modal-box">
             <h3 style="text-align:center; margin-bottom:15px;" id="modalExamName">Details</h3>
@@ -169,14 +129,13 @@
         </div>
     </div>
 
-    <!-- FIREBASE SCRIPT MODULE -->
     <script type="module">
-        // 1. Import Firebase SDKs
+        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } 
             from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // 2. Your Configuration
+        // Config
         const firebaseConfig = {
             apiKey: "AIzaSyA4Vx053wPlyy0CMVQVSV3T26Ib359obTs",
             authDomain: "selectionexam-96832.firebaseapp.com",
@@ -186,207 +145,122 @@
             appId: "1:591171111866:web:a721c6e7aa51339412ab83"
         };
 
-        // --- NEW: LOAD EXAMS DYNAMICALLY ---
-// (पुराने hardcoded exams की जगह यह कोड admin द्वारा जोड़े गए exams लाएगा)
-
-const examGrid = document.getElementById('dynamicExamGrid');
-const filterGrid = document.getElementById('dynamicFilterGrid');
-const examCollectionName = "exam_list";
-
-// Load Exams from Firebase
-const qExams = query(collection(db, examCollectionName), orderBy("name"));
-
-onSnapshot(qExams, (snapshot) => {
-    // 1. Clear Old HTML
-    examGrid.innerHTML = "";
-    filterGrid.innerHTML = "";
-
-    if (snapshot.empty) {
-        examGrid.innerHTML = "<small>No exams added by Admin yet.</small>";
-        return;
-    }
-
-    snapshot.forEach((doc) => {
-        const examName = doc.data().name;
-        
-        // Create Form Checkbox
-        const div1 = document.createElement('div');
-        div1.className = "chip-option";
-        div1.innerHTML = `
-            <input type="checkbox" id="ex_${examName}" value="${examName}" class="exam-opt">
-            <label for="ex_${examName}" class="chip-label">${examName}</label>
-        `;
-        examGrid.appendChild(div1);
-
-        // Create Filter Checkbox
-        const div2 = document.createElement('div');
-        div2.className = "chip-option filter-option";
-        div2.innerHTML = `
-            <input type="checkbox" id="fil_${examName}" value="${examName}" class="filter-opt">
-            <label for="fil_${examName}" class="chip-label filter-chip-label">${examName}</label>
-        `;
-        filterGrid.appendChild(div2);
-    });
-
-    // Re-attach Event Listeners (Kyuki HTML naya ban raha hai)
-    attachExamListeners(); 
-    attachFilterListeners();
-});
-
-// --- IMPORTANT Helper Functions ---
-// पुराने कोड में जहाँ document.querySelectorAll use हुआ था, उसे फंक्शन में डालना पड़ेगा
-function attachExamListeners() {
-    document.querySelectorAll('.exam-opt').forEach(box => {
-        box.addEventListener('change', function() {
-            if (this.checked) {
-                currentCheckbox = this;
-                openModal(this.value);
-            } else {
-                delete verifiedData[this.value];
-                updatePreferenceOptions();
-            }
-        });
-    });
-}
-
-function attachFilterListeners() {
-    const filters = document.querySelectorAll('.filter-opt');
-    filters.forEach(box => box.addEventListener('change', applyFilters));
-    // Update global filter variable needed for applyFilters function
-    // (Note: Make sure applyFilters function uses document.querySelectorAll('.filter-opt') inside it)
-}
-        // 3. Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const dbCollectionName = "candidates_data"; // Collection name in Firestore
 
-        // --- APP LOGIC VARIABLES ---
-        let currentCheckbox = null;
+        // Variables & Elements
         let verifiedData = {}; 
-        let globalServerData = []; // To store data from server
+        let currentCheckbox = null;
+        let globalServerData = []; 
 
-        // DOM Elements
+        const examGrid = document.getElementById('dynamicExamGrid');
+        const filterGrid = document.getElementById('dynamicFilterGrid');
         const modal = document.getElementById('detailsModal');
         const rollInput = document.getElementById('rollInput');
         const marksInput = document.getElementById('marksInput');
-        const modalError = document.getElementById('modalError');
         const prefSelect = document.getElementById('preference');
-        const filterCheckboxes = document.querySelectorAll('.filter-opt');
-        const resultCount = document.getElementById('resultCount');
-        const noDataMsg = document.getElementById('noDataMsg');
         const submitBtn = document.getElementById('submitBtn');
 
-        // --- 4. REALTIME DATA LISTENER (READ DATA) ---
-        // This replaces 'loadData' from localStorage
-        const q = query(collection(db, dbCollectionName), orderBy("timestamp", "desc"));
+        // --- 1. LOAD EXAMS FROM SERVER (Admin ne jo add kiye) ---
+        const qExams = query(collection(db, "exam_list"), orderBy("name"));
         
-        onSnapshot(q, (snapshot) => {
-            globalServerData = []; // Reset list
+        onSnapshot(qExams, (snapshot) => {
+            examGrid.innerHTML = "";
+            filterGrid.innerHTML = "";
+
+            if (snapshot.empty) {
+                examGrid.innerHTML = "<div style='color:red'>No exams found. Add from Admin Panel.</div>";
+                return;
+            }
+
             snapshot.forEach((doc) => {
-                globalServerData.push(doc.data());
-            });
-            
-            // Data आते ही Filter चलाओ ताकि Table अपडेट हो जाए
-            applyFilters();
-            console.log("Data synced from server!");
-        }, (error) => {
-            console.error("Error getting data: ", error);
-            resultCount.innerText = "Error loading data (Check Console)";
-        });
-
-
-        // --- 5. FORM SUBMISSION (WRITE DATA) ---
-        document.getElementById('surveyForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const name = document.getElementById('userName').value;
-            const pref = document.getElementById('preference').value;
-
-            if (!pref || Object.keys(verifiedData).length === 0) {
-                alert("Error: कृपया एग्जाम और प्राथमिकता चुनें।"); return;
-            }
-
-            // Disable button while saving
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Saving...";
-
-            let examList = Object.entries(verifiedData).map(([k, v]) => ({ name: k, roll: v.roll, marks: v.marks }));
-            
-            const userData = { 
-                name: name, 
-                exams: examList, 
-                preference: pref,
-                timestamp: serverTimestamp() // Server का टाइम
-            };
-
-            try {
-                // Add to Firestore
-                await addDoc(collection(db, dbCollectionName), userData);
+                const examName = doc.data().name;
                 
-                // Reset Form
-                this.reset(); 
-                verifiedData = {}; 
-                updatePreferenceOptions();
-                document.querySelectorAll('.exam-opt').forEach(b => b.checked = false);
-                alert("डेटा सफलतापूर्वक सर्वर पर सेव हो गया!");
-            } catch (e) {
-                console.error("Error adding document: ", e);
-                alert("डेटा सेव नहीं हो पाया। इंटरनेट चेक करें।");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Data";
-            }
-        });
+                // Form Checkbox create karein
+                const div1 = document.createElement('div');
+                div1.className = "chip-option";
+                div1.innerHTML = `
+                    <input type="checkbox" id="ex_${examName}" value="${examName}" class="exam-opt">
+                    <label for="ex_${examName}" class="chip-label">${examName}</label>
+                `;
+                examGrid.appendChild(div1);
 
-
-        // --- UI LOGIC (MODAL & VALIDATION) - Same as before ---
-        document.querySelectorAll('.exam-opt').forEach(box => {
-            box.addEventListener('change', function() {
-                if (this.checked) {
-                    currentCheckbox = this;
-                    openModal(this.value);
-                } else {
-                    delete verifiedData[this.value];
-                    updatePreferenceOptions();
-                }
+                // Filter Checkbox create karein
+                const div2 = document.createElement('div');
+                div2.className = "chip-option filter-option";
+                div2.innerHTML = `
+                    <input type="checkbox" id="fil_${examName}" value="${examName}" class="filter-opt">
+                    <label for="fil_${examName}" class="chip-label filter-chip-label">${examName}</label>
+                `;
+                filterGrid.appendChild(div2);
             });
+
+            // Checkbox banne ke baad hi listener lagayen
+            attachListeners();
         });
 
-        // Making functions available to HTML scope not needed in Module type, 
-        // so we attach listeners directly in JS
+
+        // --- 2. LOAD STUDENT DATA ---
+        const qData = query(collection(db, "candidates_data"), orderBy("timestamp", "desc"));
+        onSnapshot(qData, (snapshot) => {
+            globalServerData = [];
+            snapshot.forEach((doc) => globalServerData.push(doc.data()));
+            applyFilters(); // Data aate hi table update karein
+        });
+
+        // --- 3. LISTENERS FUNCTION ---
+        function attachListeners() {
+            // Exam Selection Listeners
+            document.querySelectorAll('.exam-opt').forEach(box => {
+                box.addEventListener('change', function() {
+                    if (this.checked) {
+                        currentCheckbox = this;
+                        openModal(this.value);
+                    } else {
+                        delete verifiedData[this.value];
+                        updatePreferenceOptions();
+                    }
+                });
+            });
+
+            // Filter Listeners
+            document.querySelectorAll('.filter-opt').forEach(box => {
+                box.addEventListener('change', applyFilters);
+            });
+        }
+
+        // --- 4. MODAL LOGIC ---
+        function openModal(examName) {
+            document.getElementById('modalExamName').innerText = examName;
+            rollInput.value = ''; marksInput.value = '';
+            document.getElementById('modalError').style.display = 'none';
+            modal.style.display = 'flex'; rollInput.focus();
+        }
+
         document.getElementById('cancelBtn').addEventListener('click', () => {
-            if (currentCheckbox) currentCheckbox.checked = false;
-            closeModal();
+            if(currentCheckbox) currentCheckbox.checked = false;
+            modal.style.display = 'none';
         });
 
         document.getElementById('confirmBtn').addEventListener('click', () => {
             const roll = rollInput.value.trim();
             const marks = marksInput.value.trim();
-            
-            if (!/^\d+$/.test(roll) || roll.length < 4 || /^(\d)\1+$/.test(roll)) {
-                showError("Invalid Roll Number (Enter valid digits)."); return;
+
+            if (!/^\d+$/.test(roll) || roll.length < 4) {
+                return showError("Invalid Roll Number");
             }
-            if (!marks || !/^\d+(\.\d+)?$/.test(marks) || parseFloat(marks) > 1000) {
-                showError("Invalid Marks (Enter numbers)."); return;
+            if (!marks || isNaN(marks)) {
+                return showError("Invalid Marks");
             }
 
             verifiedData[currentCheckbox.value] = { roll, marks };
             updatePreferenceOptions();
-            closeModal();
+            modal.style.display = 'none';
         });
 
-        function openModal(examName) {
-            document.getElementById('modalExamName').innerText = examName;
-            rollInput.value = ''; marksInput.value = '';
-            modalError.style.display = 'none';
-            modal.style.display = 'flex'; rollInput.focus();
-        }
-
-        function closeModal() {
-            modal.style.display = 'none'; currentCheckbox = null;
-        }
-
         function showError(msg) {
-            modalError.innerText = msg; modalError.style.display = 'block';
+            const err = document.getElementById('modalError');
+            err.innerText = msg; err.style.display = 'block';
         }
 
         function updatePreferenceOptions() {
@@ -401,60 +275,65 @@ function attachFilterListeners() {
             if(!hasData) prefSelect.innerHTML = '<option value="">-- पहले एग्ज़ाम टिक करें --</option>';
         }
 
-        // --- FILTER LOGIC (Updated to use globalServerData) ---
-        filterCheckboxes.forEach(box => {
-            box.addEventListener('change', applyFilters);
+        // --- 5. SUBMIT DATA ---
+        document.getElementById('surveyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('userName').value;
+            const pref = document.getElementById('preference').value;
+
+            if (!pref) return alert("Please select preference");
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Saving...";
+
+            const examList = Object.entries(verifiedData).map(([k, v]) => ({ name: k, roll: v.roll, marks: v.marks }));
+            
+            try {
+                await addDoc(collection(db, "candidates_data"), {
+                    name: name, exams: examList, preference: pref, timestamp: serverTimestamp()
+                });
+                location.reload(); // Reload to clear form properly
+            } catch (err) {
+                alert("Error: " + err.message);
+                submitBtn.disabled = false;
+            }
         });
 
+        // --- 6. FILTER & TABLE LOGIC ---
         function applyFilters() {
-            const activeFilters = Array.from(filterCheckboxes)
-                .filter(box => box.checked)
-                .map(box => box.value);
-
-            // Use the data coming from Firebase
-            const filteredData = globalServerData.filter(user => {
-                if (activeFilters.length === 0) return true; 
-                return activeFilters.every(filter => 
-                    user.exams.some(userExam => userExam.name === filter)
-                );
+            const activeFilters = Array.from(document.querySelectorAll('.filter-opt:checked')).map(b => b.value);
+            
+            const filtered = globalServerData.filter(user => {
+                if (activeFilters.length === 0) return true;
+                return activeFilters.every(f => user.exams.some(ue => ue.name === f));
             });
 
-            renderTable(filteredData);
-            
-            if (activeFilters.length > 0) {
-                resultCount.innerText = `Common Candidates: ${filteredData.length}`;
-            } else {
-                resultCount.innerText = `Total Candidates: ${filteredData.length}`;
-            }
+            document.getElementById('resultCount').innerText = `${filtered.length} Students`;
+            renderTable(filtered);
         }
 
         function renderTable(data) {
             const tbody = document.querySelector('#dataTable tbody');
-            tbody.innerHTML = ''; 
-
-            if (data.length === 0) {
-                noDataMsg.style.display = 'block';
-            } else {
-                noDataMsg.style.display = 'none';
-                data.forEach(user => {
-                    const tr = document.createElement('tr');
-                    let examsHtml = user.exams.map(e => {
-                        let style = (e.name === user.preference) ? "border-color:green; background:#f0fdf4;" : "";
-                        return `<div class="data-badge" style="${style}">
-                            <b>${e.name}</b> <span style="color:#64748b">#${e.roll}</span> 
-                            <br><span class="marks-highlight">${e.marks} M</span>
-                        </div>`;
-                    }).join('');
-
-                    tr.innerHTML = `
-                        <td style="font-weight:600;">${user.name}</td>
-                        <td>${examsHtml}</td>
-                        <td style="color:green; font-weight:bold;">${user.preference}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+            tbody.innerHTML = '';
+            
+            if(data.length === 0) {
+                document.getElementById('noDataMsg').style.display = 'block';
+                return;
             }
+            document.getElementById('noDataMsg').style.display = 'none';
+
+            data.forEach(user => {
+                const tr = document.createElement('tr');
+                const examsHtml = user.exams.map(e => {
+                    const style = (e.name === user.preference) ? "border-color:green; background:#f0fdf4;" : "";
+                    return `<span class="data-badge" style="${style}"><b>${e.name}</b> (${e.marks})</span>`;
+                }).join(' ');
+
+                tr.innerHTML = `<td><b>${user.name}</b></td><td>${examsHtml}</td><td style="color:green;font-weight:bold">${user.preference}</td>`;
+                tbody.appendChild(tr);
+            });
         }
+
     </script>
 </body>
 </html>
